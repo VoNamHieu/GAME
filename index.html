@@ -25,7 +25,7 @@
         window.OPEN_TERMS_OF_SERVICE = function() {};
         window.OPEN_PRIVACY_POLICY = function() {};
 
-        // Complete Famobi API stubs for offline mode
+        // Complete Famobi API stubs for standalone/offline mode
         window.famobi = window.famobi || {};
         window.famobi.getMoreGamesURL = function() { return ''; };
         window.famobi.log = function() {};
@@ -41,6 +41,42 @@
         window.famobi.setGameplayStop = function() {};
         window.famobi.hasFeature = function() { return false; };
         window.famobi.onRequest = function(event, cb) { if(cb) cb(); };
+
+        // Tracking & analytics stubs (prevent trackEvent crashes)
+        window.famobi.trackEvent = function() {};
+        window.famobi.trackStats = function() {};
+        window.famobi.submitHighscore = function() {};
+        window.famobi.submitScore = function() {};
+
+        // Branding stubs (prevent BrandingImage crashes)
+        window.famobi.getBrandingButtonImage = function() { return ''; };
+        window.famobi.getBrandingLogoImage = function() { return ''; };
+        window.famobi.getBrandingData = function() { return {}; };
+        window.famobi.getPrivacySettings = function() { return {}; };
+
+        // Ads stubs
+        window.famobi.hasPrerollAd = function() { return false; };
+        window.famobi.hasInterstitialAd = function() { return false; };
+
+        // LocalStorage stub
+        window.famobi.localStorage = window.famobi.localStorage || {
+            getItem: function(key) { try { return localStorage.getItem(key); } catch(e) { return null; } },
+            setItem: function(key, val) { try { localStorage.setItem(key, val); } catch(e) {} },
+            removeItem: function(key) { try { localStorage.removeItem(key); } catch(e) {} }
+        };
+
+        // Catch-all proxy: any undefined famobi method returns a no-op
+        if (typeof Proxy !== 'undefined') {
+            window.famobi = new Proxy(window.famobi, {
+                get: function(target, prop) {
+                    if (prop in target) return target[prop];
+                    if (typeof prop === 'string') {
+                        return function() {};
+                    }
+                    return undefined;
+                }
+            });
+        }
 
         // Safety timeout: force-hide splash if loading hangs
         window._loadingTimeout = setTimeout(function() {

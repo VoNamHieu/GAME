@@ -32,16 +32,22 @@ var loadModules = function (modules, urlPrefix, doneCallback) {
         loadScriptAsync(jsUrl, function () {
             var lib = window[moduleName];
             window[moduleName + 'Lib'] = lib;
-            lib({ locateFile: function () { return binaryUrl; } } ).then( function (instance) {
-                window[moduleName] = instance;
+            try {
+                var result = lib({ locateFile: function () { return binaryUrl; } });
+                // Wrap in Promise.resolve to handle non-standard thenables
+                Promise.resolve(result).then(function (instance) {
+                    window[moduleName] = instance;
+                    doneCallback();
+                }).catch(function(err) {
+                    console.error('[PATCH] WASM module ' + moduleName + ' failed: ' + err);
+                    console.warn('[PATCH] Continuing without ' + moduleName + '...');
+                    doneCallback();
+                });
+            } catch(e) {
+                console.error('[PATCH] WASM module ' + moduleName + ' init error: ' + e);
                 doneCallback();
-            }).catch(function(err) {
-                console.error('[PATCH] WASM module ' + moduleName + ' failed: ' + err);
-                console.warn('[PATCH] Continuing without ' + moduleName + '...');
-                doneCallback();
-            });
+            }
         }, function() {
-            // Script load failed, still call doneCallback to not hang
             console.warn('[PATCH] Script load failed for ' + moduleName + ', skipping...');
             doneCallback();
         });
