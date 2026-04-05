@@ -31,10 +31,7 @@ body {
 }
 
 #application-splash-wrapper {
-    background-image: url('img/background.jpg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
+    background: linear-gradient(135deg, #1a5276 0%, #1d8348 50%, #1a5276 100%);
     position: absolute;
     top: 0;
     left: 0;
@@ -61,10 +58,8 @@ body {
     height: 64px;
     width: 0%;
     position: absolute;
-    background-image: url('img/bar.png');
-    background-repeat: no-repeat;
-    background-position: left center;
-    background-size: 256px 100%;
+    background: linear-gradient(90deg, #27ae60, #2ecc71);
+    border-radius: 4px;
     z-index: 10;
 }
 
