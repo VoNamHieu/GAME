@@ -33,16 +33,26 @@ var loadModules = function (modules, urlPrefix, doneCallback) {
             var lib = window[moduleName];
             window[moduleName + 'Lib'] = lib;
             try {
-                var result = lib({ locateFile: function () { return binaryUrl; } });
-                // Wrap in Promise.resolve to handle non-standard thenables
-                Promise.resolve(result).then(function (instance) {
-                    window[moduleName] = instance;
+                var config = {
+                    locateFile: function () { return binaryUrl; }
+                };
+                var result = lib(config);
+                // Handle both old Emscripten (returns module directly) and new (returns Promise)
+                if (result && typeof result.then === 'function') {
+                    result.then(function (instance) {
+                        window[moduleName] = instance;
+                        doneCallback();
+                    })['catch'](function(err) {
+                        console.error('[PATCH] WASM module ' + moduleName + ' promise failed: ' + err);
+                        doneCallback();
+                    });
+                } else {
+                    // Old Emscripten: module returned directly, use onRuntimeInitialized
+                    if (result) {
+                        window[moduleName] = result;
+                    }
                     doneCallback();
-                }).catch(function(err) {
-                    console.error('[PATCH] WASM module ' + moduleName + ' failed: ' + err);
-                    console.warn('[PATCH] Continuing without ' + moduleName + '...');
-                    doneCallback();
-                });
+                }
             } catch(e) {
                 console.error('[PATCH] WASM module ' + moduleName + ' init error: ' + e);
                 doneCallback();
