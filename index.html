@@ -58,6 +58,23 @@
         window.famobi.hasPrerollAd = function() { return false; };
         window.famobi.hasInterstitialAd = function() { return false; };
 
+        // Famobi Analytics / Tracking API stub
+        // The game accesses window.famobi_analytics.trackEvent() etc.
+        window.famobi_analytics = {
+            trackEvent: function() {},
+            trackStats: function() {},
+            trackScreen: function() {},
+            trackAdEvent: function() {},
+            submitScore: function() {},
+            submitHighscore: function() {},
+            setScore: function() {},
+            getScore: function() { return 0; },
+            setLevel: function() {},
+            getLevel: function() { return 1; },
+            setCustomVar: function() {},
+            log: function() {}
+        };
+
         // LocalStorage stub
         window.famobi.localStorage = window.famobi.localStorage || {
             getItem: function(key) { try { return localStorage.getItem(key); } catch(e) { return null; } },
