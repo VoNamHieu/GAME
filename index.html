@@ -65,18 +65,26 @@
             removeItem: function(key) { try { localStorage.removeItem(key); } catch(e) {} }
         };
 
-        // Catch-all proxy: any undefined famobi method returns a no-op
-        if (typeof Proxy !== 'undefined') {
-            window.famobi = new Proxy(window.famobi, {
-                get: function(target, prop) {
-                    if (prop in target) return target[prop];
-                    if (typeof prop === 'string') {
-                        return function() {};
-                    }
-                    return undefined;
-                }
-            });
-        }
+        // Global error handler: suppress non-critical Famobi/tracking errors
+        window.addEventListener('error', function(e) {
+            var msg = e.message || '';
+            if (msg.indexOf('trackEvent') !== -1 ||
+                msg.indexOf('trackStats') !== -1 ||
+                msg.indexOf('submitHighscore') !== -1 ||
+                msg.indexOf('submitScore') !== -1 ||
+                msg.indexOf('BrandingImage') !== -1 ||
+                msg.indexOf('getBranding') !== -1 ||
+                msg.indexOf('showAd') !== -1 ||
+                msg.indexOf('rewardedAd') !== -1 ||
+                msg.indexOf('Tracking') !== -1 ||
+                msg.indexOf('sendLiveScore') !== -1 ||
+                msg.indexOf('reportLiveScore') !== -1 ||
+                msg.indexOf('famobi') !== -1) {
+                console.warn('[PATCH] Suppressed error:', msg);
+                e.preventDefault();
+                return true;
+            }
+        });
 
         // Safety timeout: force-hide splash if loading hangs
         window._loadingTimeout = setTimeout(function() {
