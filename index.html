@@ -102,6 +102,22 @@
 
     <script src="preloader.js"></script>
     <script src="playcanvas-stable.min.js"></script>
+    <script>
+        // Monkey-patch PlayCanvas _scriptMethod to catch script errors
+        // Without this, any error in ApiController (trackEvent etc.)
+        // breaks the entire update/initialize chain and freezes the game
+        (function() {
+            var proto = pc.ScriptComponentSystem.prototype;
+            var orig = proto._scriptMethod;
+            proto._scriptMethod = function(t, e, i) {
+                try {
+                    orig.call(this, t, e, i);
+                } catch(err) {
+                    console.warn('[PATCH] Script error in', e, ':', err.message);
+                }
+            };
+        })();
+    </script>
     <script src="__settings__.js"></script>
     <script src="__modules__.js"></script>
     <script src="__start__.js"></script>
