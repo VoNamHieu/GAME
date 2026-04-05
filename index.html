@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+    <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover' />
+    <meta charset='utf-8'>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <style></style>
+    <title>Om Nom Run</title>
+</head>
+<body>  
+
+    <div id="application-splash-wrapper">
+        <div id="application-splash">
+            <div id="loaderBar"></div>
+            <span id="loadingText">0%</span>
+        </div>
+        <img id="logo" src="img/logo.png">
+    </div>
+
+    <!-- All scripts AFTER body content so document.body exists -->
+    <script>
+        window.famobi_gameID = "om-nom-run";
+        window.ENABLE_PRIVACY_POLICY_AND_TOS = false;
+        window.OPEN_TERMS_OF_SERVICE = function() {};
+        window.OPEN_PRIVACY_POLICY = function() {};
+
+        // Complete Famobi API stubs for offline mode
+        window.famobi = window.famobi || {};
+        window.famobi.getMoreGamesURL = function() { return ''; };
+        window.famobi.log = function() {};
+        window.famobi.hasRewardedAd = function() { return false; };
+        window.famobi.showAd = function(cfg) { if(cfg && cfg.adFinished) cfg.adFinished(); };
+        window.famobi.rewardedAd = function(cfg) { if(cfg && cfg.adFinished) cfg.adFinished(); };
+        window.famobi.playerReady = function() {};
+        window.famobi.gameReady = function() {};
+        window.famobi.getCurrentLanguage = function() { return 'en'; };
+        window.famobi.getVolume = function() { return 1; };
+        window.famobi.setPreloadProgress = function() {};
+        window.famobi.setGameplayStart = function() {};
+        window.famobi.setGameplayStop = function() {};
+        window.famobi.hasFeature = function() { return false; };
+        window.famobi.onRequest = function(event, cb) { if(cb) cb(); };
+
+        // Safety timeout: force-hide splash if loading hangs
+        window._loadingTimeout = setTimeout(function() {
+            console.warn('[PATCH] Loading timeout after 60s, force-hiding splash');
+            var splash = document.getElementById('application-splash-wrapper');
+            if (splash && splash.parentElement) splash.parentElement.removeChild(splash);
+        }, 60000);
+
+        var _origGameReady = window.famobi.gameReady;
+        window.famobi.gameReady = function() {
+            clearTimeout(window._loadingTimeout);
+            if (_origGameReady) _origGameReady();
+        };
+    </script>
+
+    <script src="preloader.js"></script>
+    <script src="playcanvas-stable.min.js"></script>
+    <script src="__settings__.js"></script>
+    <script src="__modules__.js"></script>
+    <script src="__start__.js"></script>
+    <script src="__loading__.js"></script>
+
+</body>
+</html>
