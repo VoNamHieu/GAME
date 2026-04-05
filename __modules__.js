@@ -37,22 +37,12 @@ var loadModules = function (modules, urlPrefix, doneCallback) {
                     locateFile: function () { return binaryUrl; }
                 };
                 var result = lib(config);
-                // Handle both old Emscripten (returns module directly) and new (returns Promise)
-                if (result && typeof result.then === 'function') {
-                    result.then(function (instance) {
-                        window[moduleName] = instance;
-                        doneCallback();
-                    })['catch'](function(err) {
-                        console.error('[PATCH] WASM module ' + moduleName + ' promise failed: ' + err);
-                        doneCallback();
-                    });
-                } else {
-                    // Old Emscripten: module returned directly, use onRuntimeInitialized
-                    if (result) {
-                        window[moduleName] = result;
-                    }
+                // Emscripten custom thenable: .then(cb) returns module itself (not a Promise)
+                // Do NOT chain .catch() - it doesn't exist on the module object
+                result.then(function (instance) {
+                    window[moduleName] = instance;
                     doneCallback();
-                }
+                });
             } catch(e) {
                 console.error('[PATCH] WASM module ' + moduleName + ' init error: ' + e);
                 doneCallback();
