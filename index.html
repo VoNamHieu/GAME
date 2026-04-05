@@ -30,8 +30,6 @@
         window.famobi.getMoreGamesURL = function() { return ''; };
         window.famobi.log = function() {};
         window.famobi.hasRewardedAd = function() { return false; };
-        window.famobi.showAd = function(cfg) { if(cfg && cfg.adFinished) cfg.adFinished(); };
-        window.famobi.rewardedAd = function(cfg) { if(cfg && cfg.adFinished) cfg.adFinished(); };
         window.famobi.playerReady = function() {};
         window.famobi.gameReady = function() {};
         window.famobi.getCurrentLanguage = function() { return 'en'; };
@@ -54,9 +52,27 @@
         window.famobi.getBrandingData = function() { return {}; };
         window.famobi.getPrivacySettings = function() { return {}; };
 
-        // Ads stubs
+        // Ads stubs - must return Promise (used in Promise.all)
         window.famobi.hasPrerollAd = function() { return false; };
         window.famobi.hasInterstitialAd = function() { return false; };
+        window.famobi.showAd = function(cfg) {
+            if(cfg && cfg.adFinished) cfg.adFinished();
+            return Promise.resolve();
+        };
+        window.famobi.rewardedAd = function(cfg) {
+            if(cfg && cfg.adFinished) cfg.adFinished();
+            return Promise.resolve();
+        };
+
+        // Proxy: any unknown famobi method returns a no-op that returns a resolved Promise
+        window.famobi = new Proxy(window.famobi, {
+            get: function(target, prop) {
+                if (prop in target) return target[prop];
+                if (typeof prop === 'symbol') return undefined;
+                // Return a function that returns a Promise for unknown methods
+                return function() { return Promise.resolve(); };
+            }
+        });
 
         // Famobi Analytics / Tracking API stub
         // The game accesses window.famobi_analytics.trackEvent() etc.
@@ -76,6 +92,14 @@
             setCustomVar: function() {},
             log: function() {}
         };
+        // Proxy: any unknown analytics method returns a resolved Promise
+        window.famobi_analytics = new Proxy(window.famobi_analytics, {
+            get: function(target, prop) {
+                if (prop in target) return target[prop];
+                if (typeof prop === 'symbol') return undefined;
+                return function() { return Promise.resolve(); };
+            }
+        });
 
         // LocalStorage stub
         window.famobi.localStorage = window.famobi.localStorage || {
