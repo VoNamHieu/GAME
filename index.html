@@ -60,13 +60,15 @@
 
         // Famobi Analytics / Tracking API stub
         // The game accesses window.famobi_analytics.trackEvent() etc.
+        // trackEvent MUST return a Promise (game chains .then() on it)
+        var _resolvedPromise = Promise.resolve();
         window.famobi_analytics = {
-            trackEvent: function() {},
-            trackStats: function() {},
-            trackScreen: function() {},
-            trackAdEvent: function() {},
-            submitScore: function() {},
-            submitHighscore: function() {},
+            trackEvent: function() { return _resolvedPromise; },
+            trackStats: function() { return _resolvedPromise; },
+            trackScreen: function() { return _resolvedPromise; },
+            trackAdEvent: function() { return _resolvedPromise; },
+            submitScore: function() { return _resolvedPromise; },
+            submitHighscore: function() { return _resolvedPromise; },
             setScore: function() {},
             getScore: function() { return 0; },
             setLevel: function() {},
