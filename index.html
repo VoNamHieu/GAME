@@ -35,27 +35,6 @@
         var _noop = function() {};
         var _noopP = function() { return _p; }; // no-op returning Promise
 
-        // ============================================================
-        // Override character unlock prices by wrapping JSON.parse.
-        // This runs after the response is received but before the
-        // engine processes the parsed object — no XHR timing issues.
-        // ============================================================
-        (function() {
-            var _origJSONParse = JSON.parse;
-            JSON.parse = function(text) {
-                var result = _origJSONParse.apply(this, arguments);
-                try {
-                    if (result && Array.isArray(result.characters) && result.characters.length > 0 && 'unlock' in result.characters[0]) {
-                        result.characters.forEach(function(c) {
-                            if (c.unlock > 0) c.unlock = 3000;
-                        });
-                        console.log('[PATCH] Character prices overridden to 3000');
-                    }
-                } catch(e) {}
-                return result;
-            };
-        })();
-
         window.famobi = window.famobi || {};
 
         // Core API
