@@ -56,8 +56,8 @@
         window.famobi.submitHighscore = _noopP;
         window.famobi.submitScore = _noopP;
 
-        // Ads - must return Promise (used in Promise.all)
-        window.famobi.hasRewardedAd = function() { return false; };
+        // Ads - return true so "watch ad" features work (stub grants reward instantly)
+        window.famobi.hasRewardedAd = function() { return true; };
         window.famobi.hasPrerollAd = function() { return false; };
         window.famobi.hasInterstitialAd = function() { return false; };
         window.famobi.showAd = function(cfg) {
