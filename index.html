@@ -167,6 +167,63 @@
     <script src="__modules__.js"></script>
     <script src="__start__.js"></script>
     <script src="__loading__.js"></script>
+    <script>
+        // ============================================================
+        // Runtime patches: remove video ad UI, fix character prices
+        // These run after game loads because scene JSON changes get
+        // overridden by game scripts at runtime
+        // ============================================================
+        (function() {
+            var patched = false;
+            var frameCount = 0;
+            var checkInterval = setInterval(function() {
+                var app = typeof pc !== 'undefined' && pc.app;
+                if (!app || !app.root) return;
+                if (patched) return;
+                patched = true;
+                clearInterval(checkInterval);
+
+                // --- Patch 1: Hide OneRun video ad buttons every frame ---
+                // The characterOneRunLocation script re-enables these
+                // in its show() method, so we must continuously override
+                app.on('update', function() {
+                    frameCount++;
+                    // Only check every 5 frames for performance
+                    if (frameCount % 5 !== 0) return;
+
+                    var hideNames = [
+                        'ButtonOneRun', 'ButtonOneRunGreyed',
+                        'ButtonOneRunLeft', 'ButtonOneRunRight'
+                    ];
+                    for (var i = 0; i < hideNames.length; i++) {
+                        var ent = app.root.findByName(hideNames[i]);
+                        if (ent && ent.enabled) {
+                            ent.enabled = false;
+                        }
+                    }
+                });
+
+                // --- Patch 2: Override character unlock prices ---
+                // Modify loaded CharactersConfig asset data directly
+                var assets = app.assets.filter(function(a) {
+                    return a.name === 'CharactersConfig.json';
+                });
+                if (assets.length > 0 && assets[0].resource) {
+                    var chars = assets[0].resource.characters;
+                    if (chars) {
+                        for (var j = 0; j < chars.length; j++) {
+                            if (chars[j].unlock > 0) {
+                                chars[j].unlock = 3000;
+                            }
+                        }
+                        console.log('[PATCH] Character prices set to 3000');
+                    }
+                }
+
+                console.log('[PATCH] Video ad UI and character price patches applied');
+            }, 200);
+        })();
+    </script>
 
 </body>
 </html>
