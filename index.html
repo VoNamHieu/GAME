@@ -56,7 +56,7 @@
         window.famobi.submitHighscore = _noopP;
         window.famobi.submitScore = _noopP;
 
-        // Ads - all disabled for standalone mode (no video ads)
+        // Ads - must return Promise (used in Promise.all)
         window.famobi.hasRewardedAd = function() { return false; };
         window.famobi.hasPrerollAd = function() { return false; };
         window.famobi.hasInterstitialAd = function() { return false; };
@@ -65,12 +65,12 @@
             return _p;
         };
         window.famobi.rewardedAd = function(cb) {
-            if(typeof cb === 'function') cb({rewardGranted: false});
+            if(typeof cb === 'function') cb({rewardGranted: true});
             else if(cb && cb.adFinished) cb.adFinished();
             return _p;
         };
         window.famobi.showRewardedAd = function(cb) {
-            if(typeof cb === 'function') cb({rewardGranted: false});
+            if(typeof cb === 'function') cb({rewardGranted: true});
             return _p;
         };
         window.famobi.showInterstitialAd = _noopP;
@@ -167,35 +167,6 @@
     <script src="__modules__.js"></script>
     <script src="__start__.js"></script>
     <script src="__loading__.js"></script>
-    <script>
-        // After all game scripts load, patch Apicontroller to disable ad-related features
-        // CharacterOneRunLocation and RevivePopup use static methods on Apicontroller
-        // that always return true (not hasRewardedAd). Override them here.
-        (function() {
-            var checkInterval = setInterval(function() {
-                if (typeof Apicontroller !== 'undefined') {
-                    clearInterval(checkInterval);
-                    // Find and override static methods that return true (ad availability checks)
-                    // These control "Get for 1 run" button and "revive" popup visibility
-                    for (var key in Apicontroller) {
-                        if (Apicontroller.hasOwnProperty(key)) {
-                            var val = Apicontroller[key];
-                            if (typeof val === 'function') {
-                                try {
-                                    // Test: does this function return true with no side effects?
-                                    var src = val.toString();
-                                    if (src === 'function(){return!![];}' || src === 'function(){return !0;}') {
-                                        console.log('[PATCH] Overriding Apicontroller.' + key + ' (was: return true)');
-                                        Apicontroller[key] = function() { return false; };
-                                    }
-                                } catch(e) {}
-                            }
-                        }
-                    }
-                }
-            }, 100);
-        })();
-    </script>
 
 </body>
 </html>
