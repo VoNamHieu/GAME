@@ -60,7 +60,7 @@
          "key": "OmNelle",
          "name": "OM NELLE",
          "avatar": "OmNellePreview",
-         "unlock": 3000,
+         "unlock": 7000,
          "stunts": [
             {
                "icon": "Trick_Icon_OmNelle_HailToTheMasses.png",
@@ -116,7 +116,7 @@
          "key": "RoboKid",
          "name": "ROBO KID",
          "avatar": "RoboKidPreview",
-         "unlock": 3000,
+         "unlock": 10000,
          "stunts": [
             {
                "icon": "Trick_Icon_RoboBoy_ChillaxKid.png",
@@ -172,7 +172,7 @@
          "key": "TechKid",
          "name": "TECH KID",
          "avatar": "TechKidPreview",
-         "unlock": 3000,
+         "unlock": 15000,
          "stunts": [
             {
                "icon": "Trick_Icon_TechKid_LowTrajectory.png",
@@ -228,7 +228,7 @@
          "key": "SpaceCowgirl",
          "name": "SPACE COWGIRL",
          "avatar": "SpaceCowgirlPreview",
-         "unlock": 3000,
+         "unlock": 25000,
          "stunts": [
             {
                "icon": "Trick_Icon_Cowgirl_01.png",
@@ -284,7 +284,7 @@
          "key": "SwordKid",
          "name": "SWORD KID",
          "avatar": "SwordKidPreview",
-         "unlock": 3000,
+         "unlock": 3500,
          "stunts": [
             {
                "icon": "Trick_Icon_SwordKid_Bladespin.png",
@@ -340,7 +340,7 @@
          "key": "Lick",
          "name": "LICK",
          "avatar": "LickPreview",
-         "unlock": 3000,
+         "unlock": 30000,
          "stunts": [
             {
                "icon": "Trick_Icon_Lick_TongueTwister.png",
@@ -396,7 +396,7 @@
          "key": "Boo",
          "name": "BOO",
          "avatar": "BooPreview",
-         "unlock": 3000,
+         "unlock": 46000,
          "stunts": [
             {
                "icon": "Trick_Icon_Boo_BraceYourself.png",
@@ -452,7 +452,7 @@
          "key": "OmNom",
          "name": "OM NOM",
          "avatar": "OmNomPreview",
-         "unlock": 3000,
+         "unlock": 66000,
          "stunts": [
             {
                "icon": "Trick_Icon_OmNomClassic_Underachiever.png",
@@ -508,7 +508,7 @@
          "key": "NomOfSteel",
          "name": "NOM OF STEEL",
          "avatar": "NomOfSteelPreview",
-         "unlock": 3000,
+         "unlock": 66000,
          "stunts": [
             {
                "icon": "Trick_Icon_Steel_Underachiever.png",
@@ -564,7 +564,7 @@
          "key": "FireNom",
          "name": "FIRE NOM",
          "avatar": "FireNomPreview",
-         "unlock": 3000,
+         "unlock": 66000,
          "stunts": [
             {
                "icon": "Trick_Icon_Fire_Underachiever.png",
@@ -620,7 +620,7 @@
          "key": "EarthNom",
          "name": "EARTH NOM",
          "avatar": "EarthNomPreview",
-         "unlock": 3000,
+         "unlock": 66000,
          "stunts": [
             {
                "icon": "Trick_Icon_Earth_LogRoll.png",
@@ -676,7 +676,7 @@
          "key": "IceNom",
          "name": "ICE NOM",
          "avatar": "IceNomPreview",
-         "unlock": 3000,
+         "unlock": 66000,
          "stunts": [
             {
                "icon": "Trick_Icon_Ice_Underachiever.png",
@@ -732,7 +732,7 @@
          "key": "WindNom",
          "name": "WIND-NOM",
          "avatar": "WindNomPreview",
-         "unlock": 3000,
+         "unlock": 66000,
          "stunts": [
             {
                "icon": "Trick_Icon_Wind_HailToTheMasses.png",
@@ -788,7 +788,7 @@
          "key": "OmNomX",
          "name": "OM NOM X",
          "avatar": "OmNomXPreview",
-         "unlock": 3000,
+         "unlock": 78000,
          "stunts": [
             {
                "icon": "Trick_Icon_X_LogRoll.png",
