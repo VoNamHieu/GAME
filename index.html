@@ -56,8 +56,8 @@
         window.famobi.submitHighscore = _noopP;
         window.famobi.submitScore = _noopP;
 
-        // Ads - return true so "watch ad" features work (stub grants reward instantly)
-        window.famobi.hasRewardedAd = function() { return true; };
+        // Ads - all disabled for standalone mode (no video ads)
+        window.famobi.hasRewardedAd = function() { return false; };
         window.famobi.hasPrerollAd = function() { return false; };
         window.famobi.hasInterstitialAd = function() { return false; };
         window.famobi.showAd = function(cfg) {
@@ -65,12 +65,12 @@
             return _p;
         };
         window.famobi.rewardedAd = function(cb) {
-            if(typeof cb === 'function') cb({rewardGranted: true});
+            if(typeof cb === 'function') cb({rewardGranted: false});
             else if(cb && cb.adFinished) cb.adFinished();
             return _p;
         };
         window.famobi.showRewardedAd = function(cb) {
-            if(typeof cb === 'function') cb({rewardGranted: true});
+            if(typeof cb === 'function') cb({rewardGranted: false});
             return _p;
         };
         window.famobi.showInterstitialAd = _noopP;
