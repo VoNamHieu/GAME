@@ -37,39 +37,47 @@
 
         // ============================================================
         // Intercept CharactersConfig.json to override unlock prices
-        // The file on disk has correct values but browser may cache
-        // the old version. This ensures prices are always 3000.
+        // PlayCanvas reads responses via onreadystatechange (before
+        // the 'load' event), so we must patch responseText/response
+        // before readyState 4 is seen by the engine.
         // ============================================================
         (function() {
             var _origXHROpen = XMLHttpRequest.prototype.open;
-            var _origXHRGetter = Object.getOwnPropertyDescriptor(XMLHttpRequest.prototype, 'response');
-            var _origTextGetter = Object.getOwnPropertyDescriptor(XMLHttpRequest.prototype, 'responseText');
 
             XMLHttpRequest.prototype.open = function(method, url) {
                 this._patchUrl = (typeof url === 'string' && url.indexOf('CharactersConfig') !== -1);
-                return _origXHROpen.apply(this, arguments);
-            };
-
-            var _origSend = XMLHttpRequest.prototype.send;
-            XMLHttpRequest.prototype.send = function() {
                 if (this._patchUrl) {
-                    this.addEventListener('load', function() {
-                        try {
-                            var raw = _origTextGetter.get.call(this) || _origXHRGetter.get.call(this);
-                            if (typeof raw === 'string' && raw.indexOf('"unlock"') !== -1) {
-                                var data = JSON.parse(raw);
-                                data.characters.forEach(function(c) {
-                                    if (c.unlock > 0) c.unlock = 3000;
-                                });
-                                var patched = JSON.stringify(data);
-                                Object.defineProperty(this, 'responseText', { get: function() { return patched; } });
-                                Object.defineProperty(this, 'response', { get: function() { return patched; } });
-                                console.log('[PATCH] Character prices overridden to 3000');
-                            }
-                        } catch(e) { console.warn('[PATCH] CharactersConfig intercept error:', e); }
+                    var xhr = this;
+                    var _origOnReadyStateChange;
+
+                    Object.defineProperty(this, 'onreadystatechange', {
+                        get: function() { return _origOnReadyStateChange; },
+                        set: function(fn) {
+                            _origOnReadyStateChange = function() {
+                                if (xhr.readyState === 4 && xhr.status === 200) {
+                                    try {
+                                        var raw = XMLHttpRequest.prototype.__lookupGetter__('responseText')
+                                            ? XMLHttpRequest.prototype.__lookupGetter__('responseText').call(xhr)
+                                            : Object.getOwnPropertyDescriptor(XMLHttpRequest.prototype, 'responseText').get.call(xhr);
+                                        if (typeof raw === 'string' && raw.indexOf('"unlock"') !== -1) {
+                                            var data = JSON.parse(raw);
+                                            data.characters.forEach(function(c) {
+                                                if (c.unlock > 0) c.unlock = 3000;
+                                            });
+                                            var patched = JSON.stringify(data);
+                                            Object.defineProperty(xhr, 'responseText', { get: function() { return patched; }, configurable: true });
+                                            Object.defineProperty(xhr, 'response', { get: function() { return patched; }, configurable: true });
+                                            console.log('[PATCH] Character prices overridden to 3000');
+                                        }
+                                    } catch(e) { console.warn('[PATCH] CharactersConfig intercept error:', e); }
+                                }
+                                return fn.apply(this, arguments);
+                            };
+                        },
+                        configurable: true
                     });
                 }
-                return _origSend.apply(this, arguments);
+                return _origXHROpen.apply(this, arguments);
             };
         })();
 
