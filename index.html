@@ -36,48 +36,23 @@
         var _noopP = function() { return _p; }; // no-op returning Promise
 
         // ============================================================
-        // Intercept CharactersConfig.json to override unlock prices
-        // PlayCanvas reads responses via onreadystatechange (before
-        // the 'load' event), so we must patch responseText/response
-        // before readyState 4 is seen by the engine.
+        // Override character unlock prices by wrapping JSON.parse.
+        // This runs after the response is received but before the
+        // engine processes the parsed object — no XHR timing issues.
         // ============================================================
         (function() {
-            var _origXHROpen = XMLHttpRequest.prototype.open;
-
-            XMLHttpRequest.prototype.open = function(method, url) {
-                this._patchUrl = (typeof url === 'string' && url.indexOf('CharactersConfig') !== -1);
-                if (this._patchUrl) {
-                    var xhr = this;
-                    var _origOnReadyStateChange;
-
-                    Object.defineProperty(this, 'onreadystatechange', {
-                        get: function() { return _origOnReadyStateChange; },
-                        set: function(fn) {
-                            _origOnReadyStateChange = function() {
-                                if (xhr.readyState === 4 && xhr.status === 200) {
-                                    try {
-                                        var raw = XMLHttpRequest.prototype.__lookupGetter__('responseText')
-                                            ? XMLHttpRequest.prototype.__lookupGetter__('responseText').call(xhr)
-                                            : Object.getOwnPropertyDescriptor(XMLHttpRequest.prototype, 'responseText').get.call(xhr);
-                                        if (typeof raw === 'string' && raw.indexOf('"unlock"') !== -1) {
-                                            var data = JSON.parse(raw);
-                                            data.characters.forEach(function(c) {
-                                                if (c.unlock > 0) c.unlock = 3000;
-                                            });
-                                            var patched = JSON.stringify(data);
-                                            Object.defineProperty(xhr, 'responseText', { get: function() { return patched; }, configurable: true });
-                                            Object.defineProperty(xhr, 'response', { get: function() { return patched; }, configurable: true });
-                                            console.log('[PATCH] Character prices overridden to 3000');
-                                        }
-                                    } catch(e) { console.warn('[PATCH] CharactersConfig intercept error:', e); }
-                                }
-                                return fn.apply(this, arguments);
-                            };
-                        },
-                        configurable: true
-                    });
-                }
-                return _origXHROpen.apply(this, arguments);
+            var _origJSONParse = JSON.parse;
+            JSON.parse = function(text) {
+                var result = _origJSONParse.apply(this, arguments);
+                try {
+                    if (result && Array.isArray(result.characters) && result.characters.length > 0 && 'unlock' in result.characters[0]) {
+                        result.characters.forEach(function(c) {
+                            if (c.unlock > 0) c.unlock = 3000;
+                        });
+                        console.log('[PATCH] Character prices overridden to 3000');
+                    }
+                } catch(e) {}
+                return result;
             };
         })();
 
